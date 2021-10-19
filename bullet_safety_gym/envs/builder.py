@@ -33,10 +33,14 @@ def get_physics_parameters(task: str) -> tuple:
         If no class is found for task name.
     """
     assert hasattr(tasks, task), f'Task={task} not implemented.'
-    if task in ['CircleTask', 'RunTask', 'GatherTask']:
+    if task in ['RunTask', 'GatherTask']:
         # the physics parameters are identically to PyBullet locomotion envs
-        time_step = 1/240.
+        time_step = 1/120.
         frame_skip = 4
+        number_solver_iterations = 5
+    elif task in ['CircleTask']:
+        time_step = 1/60.
+        frame_skip = 6
         number_solver_iterations = 5
     elif task in ['ReachGoalTask', 'PushTask']:
         # avoid frame skip for collision detection: PyBullet returns only
@@ -47,6 +51,7 @@ def get_physics_parameters(task: str) -> tuple:
     else:
         raise ValueError(f'No physics parameters defined for task={task}')
     return time_step, frame_skip, number_solver_iterations
+
 
 
 class EnvironmentBuilder(gym.Env):
