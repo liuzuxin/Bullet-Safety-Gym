@@ -22,7 +22,7 @@ setup(
     license='MIT license',
     url='https://github.com/svengronauer/Bullet-Safety-Gym',
     install_requires=[
-        'gym>=0.17.2',
+        'gym',
         'numpy',
         'pybullet>=3.0.6'
     ],
