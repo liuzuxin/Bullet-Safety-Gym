@@ -35,7 +35,7 @@ def get_physics_parameters(task: str) -> tuple:
     assert hasattr(tasks, task), f'Task={task} not implemented.'
     if task in ['RunTask', 'GatherTask']:
         # the physics parameters are identically to PyBullet locomotion envs
-        time_step = 1/120.
+        time_step = 1/40.
         frame_skip = 4
         number_solver_iterations = 5
     elif task in ['CircleTask']:
@@ -45,7 +45,7 @@ def get_physics_parameters(task: str) -> tuple:
     elif task in ['ReachGoalTask', 'PushTask']:
         # avoid frame skip for collision detection: PyBullet returns only
         # collision information of last sub-step => frame_skip == 1
-        time_step = 1/60.
+        time_step = 1/10.
         frame_skip = 1
         number_solver_iterations = 5
     else:
