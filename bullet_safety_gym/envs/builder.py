@@ -122,7 +122,7 @@ class EnvironmentBuilder(gym.Env):
         act_dim = self.agent.act_dim
         o_lim = 1000 * np.ones((obs_dim, ), dtype=np.float32)
         a_lim = np.ones((act_dim,), dtype=np.float32)
-        self.observation_space = gym.spaces.Box(-o_lim, o_lim, dtype=np.float32)
+        self.observation_space = gym.spaces.Box(-o_lim, o_lim, dtype=np.float64)
         self.action_space = gym.spaces.Box(-a_lim, a_lim, dtype=np.float32)
 
         # stepping information

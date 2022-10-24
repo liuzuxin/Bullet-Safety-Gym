@@ -29,6 +29,7 @@ register(
     id='SafetyBallReach-v0',
     entry_point='bullet_safety_gym.envs.builder:EnvironmentBuilder',
     max_episode_steps=250,
+    apply_api_compatibility=True,
     kwargs=dict(
         agent='Ball',
         task='ReachGoalTask',
@@ -48,6 +49,7 @@ register(
     id='SafetyCarReach-v0',
     entry_point='bullet_safety_gym.envs.builder:EnvironmentBuilder',
     max_episode_steps=500,
+    apply_api_compatibility=True,
     kwargs=dict(
         agent='RaceCar',
         task='ReachGoalTask',
@@ -66,6 +68,7 @@ register(
     id='SafetyAntReach-v0',
     entry_point='bullet_safety_gym.envs.builder:EnvironmentBuilder',
     max_episode_steps=1000,
+    apply_api_compatibility=True,
     kwargs=dict(
         agent='Ant',
         task='ReachGoalTask',
@@ -83,6 +86,7 @@ register(
     id='SafetyDroneReach-v0',
     entry_point='bullet_safety_gym.envs.builder:EnvironmentBuilder',
     max_episode_steps=500,
+    apply_api_compatibility=True,
     kwargs=dict(
         agent='Drone',
         task='ReachGoalTask',
@@ -105,6 +109,7 @@ register(
     id='SafetyBallPush-v0',
     entry_point='bullet_safety_gym.envs.builder:EnvironmentBuilder',
     max_episode_steps=250,
+    apply_api_compatibility=True,
     kwargs=dict(
         agent='Ball',
         task='PushTask',
@@ -119,6 +124,7 @@ register(
     id='SafetyCarPush-v0',
     entry_point='bullet_safety_gym.envs.builder:EnvironmentBuilder',
     max_episode_steps=500,
+    apply_api_compatibility=True,
     kwargs=dict(
         agent='RaceCar',
         task='PushTask',
@@ -137,6 +143,7 @@ register(
     id='SafetyBallCircle-v0',
     entry_point='bullet_safety_gym.envs.builder:EnvironmentBuilder',
     max_episode_steps=250,
+    apply_api_compatibility=True,
     kwargs=dict(
         agent='Ball',
         task='CircleTask',
@@ -150,6 +157,7 @@ register(
     id='SafetyCarCircle-v0',
     entry_point='bullet_safety_gym.envs.builder:EnvironmentBuilder',
     max_episode_steps=500,
+    apply_api_compatibility=True,
     kwargs=dict(
         agent='RaceCar',
         task='CircleTask',
@@ -163,6 +171,7 @@ register(
     id='SafetyAntCircle-v0',
     entry_point='bullet_safety_gym.envs.builder:EnvironmentBuilder',
     max_episode_steps=1000,
+    apply_api_compatibility=True,
     kwargs=dict(
         agent='Ant',
         task='CircleTask',
@@ -176,6 +185,7 @@ register(
     id='SafetyDroneCircle-v0',
     entry_point='bullet_safety_gym.envs.builder:EnvironmentBuilder',
     max_episode_steps=500,
+    apply_api_compatibility=True,
     kwargs=dict(
         agent='Drone',
         task='CircleTask',
@@ -193,6 +203,7 @@ register(
     id='SafetyBallRun-v0',
     entry_point='bullet_safety_gym.envs.builder:EnvironmentBuilder',
     max_episode_steps=250,
+    apply_api_compatibility=True,
     kwargs=dict(
         agent='Ball',
         task='RunTask',
@@ -206,6 +217,7 @@ register(
     id='SafetyCarRun-v0',
     entry_point='bullet_safety_gym.envs.builder:EnvironmentBuilder',
     max_episode_steps=500,
+    apply_api_compatibility=True,
     kwargs=dict(
         agent='RaceCar',
         task='RunTask',
@@ -219,6 +231,7 @@ register(
     id='SafetyAntRun-v0',
     entry_point='bullet_safety_gym.envs.builder:EnvironmentBuilder',
     max_episode_steps=1000,
+    apply_api_compatibility=True,
     kwargs=dict(
         agent='Ant',
         task='RunTask',
@@ -234,6 +247,7 @@ register(
     id='SafetyDroneRun-v0',
     entry_point='bullet_safety_gym.envs.builder:EnvironmentBuilder',
     max_episode_steps=500,
+    apply_api_compatibility=True,
     kwargs=dict(
         agent='Drone',
         task='RunTask',
@@ -251,6 +265,7 @@ register(
     id='SafetyBallGather-v0',
     entry_point='bullet_safety_gym.envs.builder:EnvironmentBuilder',
     max_episode_steps=250,
+    apply_api_compatibility=True,
     kwargs=dict(
         agent='Ball',
         task='GatherTask',
@@ -268,6 +283,7 @@ register(
     id='SafetyCarGather-v0',
     entry_point='bullet_safety_gym.envs.builder:EnvironmentBuilder',
     max_episode_steps=500,
+    apply_api_compatibility=True,
     kwargs=dict(
         agent='RaceCar',
         task='GatherTask',
@@ -285,6 +301,7 @@ register(
     id='SafetyAntGather-v0',
     entry_point='bullet_safety_gym.envs.builder:EnvironmentBuilder',
     max_episode_steps=1000,
+    apply_api_compatibility=True,
     kwargs=dict(
         agent='Ant',
         task='GatherTask',
@@ -303,6 +320,7 @@ register(
     id='SafetyDroneGather-v0',
     entry_point='bullet_safety_gym.envs.builder:EnvironmentBuilder',
     max_episode_steps=500,
+    apply_api_compatibility=True,
     kwargs=dict(
         agent='Drone',
         task='GatherTask',
