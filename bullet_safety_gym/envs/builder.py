@@ -4,14 +4,46 @@ r"""Open-Safety Gym
 
     Distributed under the MIT License.
 """
-import pybullet as pb
+
+import ctypes
+import sys
+import os
 import numpy as np
+import pkgutil
 import gym
+from gym import error
+
+class RedirectStream(object):
+    '''
+    Hide some messages when building the PyBullet engine.
+    '''
+    @staticmethod
+    def _flush_c_stream(stream):
+        streamname = stream.name[1:-1]
+        libc = ctypes.CDLL(None)
+        libc.fflush(ctypes.c_void_p.in_dll(libc, streamname))
+
+    def __init__(self, stream=sys.stdout, file=os.devnull):
+        self.stream = stream
+        self.file = file
+
+    def __enter__(self):
+        self.stream.flush()  # ensures python stream unaffected 
+        self.fd = open(self.file, "w+")
+        self.dup_stream = os.dup(self.stream.fileno())
+        os.dup2(self.fd.fileno(), self.stream.fileno()) # replaces stream
+
+    def __exit__(self, type, value, traceback):
+        RedirectStream._flush_c_stream(self.stream)  # ensures C stream buffer empty
+        os.dup2(self.dup_stream, self.stream.fileno()) # restores stream
+        os.close(self.dup_stream)
+        self.fd.close()
+
+with RedirectStream(sys.stderr):
+    import pybullet as pb
 from pybullet_utils import bullet_client
 from bullet_safety_gym.envs.obstacles import create_obstacles
 from bullet_safety_gym.envs import bases, worlds, tasks, agents
-import os
-import pkgutil
 
 
 def get_physics_parameters(task: str) -> tuple:
@@ -128,6 +160,15 @@ class EnvironmentBuilder(gym.Env):
         # stepping information
         self.iteration = 0
 
+    def seed(self, seed=None):
+        if seed is not None and not (isinstance(seed, int) and 0 <= seed):
+            raise error.Error(f"Seed must be a non-negative integer or omitted, not {seed}")
+
+        seed_seq = np.random.SeedSequence(seed)
+        np_seed = seed_seq.entropy
+        rng = np.random.Generator(np.random.PCG64(seed_seq))
+        return rng, np_seed
+
     def _setup_client_and_physics(
             self,
             graphics=False
@@ -148,10 +189,11 @@ class EnvironmentBuilder(gym.Env):
         bc: BulletClient
             The instance of the created PyBullet client process.
         """
-        if graphics or self.use_graphics:
-            bc = bullet_client.BulletClient(connection_mode=pb.GUI)
-        else:
-            bc = bullet_client.BulletClient(connection_mode=pb.DIRECT)
+        with RedirectStream(sys.stdout):
+            if graphics or self.use_graphics:
+                bc = bullet_client.BulletClient(connection_mode=pb.GUI)
+            else:
+                bc = bullet_client.BulletClient(connection_mode=pb.DIRECT)
         # optionally enable EGL for faster headless rendering
         try:
             if os.environ["PYBULLET_EGL"]:
