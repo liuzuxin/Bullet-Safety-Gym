@@ -142,7 +142,7 @@ register(
 register(
     id='SafetyBallCircle-v0',
     entry_point='bullet_safety_gym.envs.builder:EnvironmentBuilder',
-    max_episode_steps=250,
+    max_episode_steps=200,
     apply_api_compatibility=True,
     kwargs=dict(
         agent='Ball',
@@ -156,7 +156,7 @@ register(
 register(
     id='SafetyCarCircle-v0',
     entry_point='bullet_safety_gym.envs.builder:EnvironmentBuilder',
-    max_episode_steps=500,
+    max_episode_steps=300,
     apply_api_compatibility=True,
     kwargs=dict(
         agent='RaceCar',
@@ -170,7 +170,7 @@ register(
 register(
     id='SafetyAntCircle-v0',
     entry_point='bullet_safety_gym.envs.builder:EnvironmentBuilder',
-    max_episode_steps=1000,
+    max_episode_steps=300,
     apply_api_compatibility=True,
     kwargs=dict(
         agent='Ant',
@@ -184,7 +184,7 @@ register(
 register(
     id='SafetyDroneCircle-v0',
     entry_point='bullet_safety_gym.envs.builder:EnvironmentBuilder',
-    max_episode_steps=500,
+    max_episode_steps=300,
     apply_api_compatibility=True,
     kwargs=dict(
         agent='Drone',
@@ -202,7 +202,7 @@ register(
 register(
     id='SafetyBallRun-v0',
     entry_point='bullet_safety_gym.envs.builder:EnvironmentBuilder',
-    max_episode_steps=250,
+    max_episode_steps=100,
     apply_api_compatibility=True,
     kwargs=dict(
         agent='Ball',
@@ -216,7 +216,7 @@ register(
 register(
     id='SafetyCarRun-v0',
     entry_point='bullet_safety_gym.envs.builder:EnvironmentBuilder',
-    max_episode_steps=500,
+    max_episode_steps=200,
     apply_api_compatibility=True,
     kwargs=dict(
         agent='RaceCar',
@@ -230,7 +230,7 @@ register(
 register(
     id='SafetyAntRun-v0',
     entry_point='bullet_safety_gym.envs.builder:EnvironmentBuilder',
-    max_episode_steps=1000,
+    max_episode_steps=200,
     apply_api_compatibility=True,
     kwargs=dict(
         agent='Ant',
@@ -246,7 +246,7 @@ register(
 register(
     id='SafetyDroneRun-v0',
     entry_point='bullet_safety_gym.envs.builder:EnvironmentBuilder',
-    max_episode_steps=500,
+    max_episode_steps=100,
     apply_api_compatibility=True,
     kwargs=dict(
         agent='Drone',
