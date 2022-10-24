@@ -1,4 +1,5 @@
-**Status:** Development (Major updates may be expected)
+**Notes:** This repo only supports `gym>=0.26.0` API version due to the major changes in the `reset` and `step` functions. Check [this release note](https://github.com/openai/gym/releases/tag/0.26.0) for details.
+For the old API version, please use the `old` [branch](https://github.com/liuzuxin/Bullet-Safety-Gym/tree/old) which requires `gym==0.20.0`.
 
 # Bullet-Safety-Gym
 
@@ -92,7 +93,7 @@ Clone the repository and install the Bullet-Safety-Gym package via pip. Use the
 following three lines:
 
 ```
-git clone https://github.com/SvenGronauer/Bullet-Safety-Gym.git
+git clone https://github.com/liuzuxin/Bullet-Safety-Gym.git
 
 cd Bullet-Safety-Gym
 
@@ -101,7 +102,7 @@ pip install -e .
 
 ## Supported Systems
 
-We currently support Linux and OS X running Python 3.5 or greater.
+We currently support Linux and OS X running Python 3.7 or greater.
 Windows should also work (but has not been tested yet).
 
 Note: This package has been tested on Mac OS Mojave and Ubuntu (18.04 LTS, 
@@ -126,13 +127,13 @@ environments can be simply instantiated via `gym.make`. See:
 >>> env = gym.make('SafetyCarGather-v0')
 ```
 
-The functional interface follows the API of the OpenAI Gym (Brockman et al., 
-2016) that consists of the three following important functions:
+The functional interface follows the API of the OpenAI Gym that is or greater than the `0.26.0` version. There are major changes of the `reset` and `step` functions. Check [this release note](https://github.com/openai/gym/releases/tag/0.26.0) for details. 
+For the old API version, please use the `old` [branch](https://github.com/liuzuxin/Bullet-Safety-Gym/tree/old) which requires `gym==0.20.0`.
 
 ```
->>> observation = env.reset()
+>>> observation, info = env.reset()
 >>> random_action = env.action_space.sample()  # usually the action is determined by a policy
->>> next_observation, reward, done, info = env.step(random_action)
+>>> next_observation, reward, terminated, truncated, info = env.step(random_action)
 ```
 
 Besides the reward signal, our environments provide an additional cost signal, 
@@ -154,10 +155,10 @@ env = gym.make('SafetyAntCircle-v0')
 while True:
     done = False
     env.render()  # make GUI of PyBullet appear
-    x = env.reset()
+    o, info = env.reset()
     while not done:
         random_action = env.action_space.sample()
-        x, reward, done, info = env.step(random_action)
+        o, reward, terminated, truncated, info = env.step(random_action)
 ```
 Note that only calling the render function before the reset function triggers 
 visuals.
