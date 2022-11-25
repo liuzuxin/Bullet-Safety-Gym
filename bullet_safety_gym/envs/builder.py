@@ -13,31 +13,36 @@ import pkgutil
 import gym
 from gym import error
 
+
 class RedirectStream(object):
     '''
     Hide some messages when building the PyBullet engine.
     '''
+
     @staticmethod
     def _flush_c_stream(stream):
-        streamname = stream.name[1:-1]
-        libc = ctypes.CDLL(None)
-        libc.fflush(ctypes.c_void_p.in_dll(libc, streamname))
+        if isinstance(stream.name, str):
+            streamname = stream.name[1:-1]
+            libc = ctypes.CDLL(None)
+            libc.fflush(ctypes.c_void_p.in_dll(libc, streamname))
 
     def __init__(self, stream=sys.stdout, file=os.devnull):
         self.stream = stream
         self.file = file
 
     def __enter__(self):
-        self.stream.flush()  # ensures python stream unaffected 
+        self.stream.flush()  # ensures python stream unaffected
         self.fd = open(self.file, "w+")
         self.dup_stream = os.dup(self.stream.fileno())
-        os.dup2(self.fd.fileno(), self.stream.fileno()) # replaces stream
+        os.dup2(self.fd.fileno(), self.stream.fileno())  # replaces stream
 
     def __exit__(self, type, value, traceback):
-        RedirectStream._flush_c_stream(self.stream)  # ensures C stream buffer empty
-        os.dup2(self.dup_stream, self.stream.fileno()) # restores stream
+        RedirectStream._flush_c_stream(
+            self.stream)  # ensures C stream buffer empty
+        os.dup2(self.dup_stream, self.stream.fileno())  # restores stream
         os.close(self.dup_stream)
         self.fd.close()
+
 
 with RedirectStream(sys.stderr):
     import pybullet as pb
@@ -67,23 +72,22 @@ def get_physics_parameters(task: str) -> tuple:
     assert hasattr(tasks, task), f'Task={task} not implemented.'
     if task in ['RunTask', 'GatherTask']:
         # the physics parameters are identically to PyBullet locomotion envs
-        time_step = 1/120.
+        time_step = 1 / 120.
         frame_skip = 4
         number_solver_iterations = 5
     elif task in ['CircleTask']:
-        time_step = 1/60.
+        time_step = 1 / 60.
         frame_skip = 6
         number_solver_iterations = 5
     elif task in ['ReachGoalTask', 'PushTask']:
         # avoid frame skip for collision detection: PyBullet returns only
         # collision information of last sub-step => frame_skip == 1
-        time_step = 1/60.
+        time_step = 1 / 60.
         frame_skip = 1
         number_solver_iterations = 5
     else:
         raise ValueError(f'No physics parameters defined for task={task}')
     return time_step, frame_skip, number_solver_iterations
-
 
 
 class EnvironmentBuilder(gym.Env):
@@ -120,15 +124,13 @@ class EnvironmentBuilder(gym.Env):
     """
     metadata = {'render.modes': ['human', 'rgb_array']}
 
-    def __init__(
-            self,
-            agent: str,
-            task: str,
-            obstacles: dict,
-            world: dict,
-            graphics=False,
-            debug=False
-    ):
+    def __init__(self,
+                 agent: str,
+                 task: str,
+                 obstacles: dict,
+                 world: dict,
+                 graphics=False,
+                 debug=False):
         self.input_parameters = locals()  # save setting for later reset
         self.use_graphics = graphics
         self.debug = debug
@@ -153,8 +155,10 @@ class EnvironmentBuilder(gym.Env):
         obs_dim = self.get_observation().shape[0]
         act_dim = self.agent.act_dim
         o_lim = 1000 * np.ones((obs_dim, ), dtype=np.float32)
-        a_lim = np.ones((act_dim,), dtype=np.float32)
-        self.observation_space = gym.spaces.Box(-o_lim, o_lim, dtype=np.float64)
+        a_lim = np.ones((act_dim, ), dtype=np.float32)
+        self.observation_space = gym.spaces.Box(-o_lim,
+                                                o_lim,
+                                                dtype=np.float64)
         self.action_space = gym.spaces.Box(-a_lim, a_lim, dtype=np.float32)
 
         # stepping information
@@ -162,17 +166,17 @@ class EnvironmentBuilder(gym.Env):
 
     def seed(self, seed=None):
         if seed is not None and not (isinstance(seed, int) and 0 <= seed):
-            raise error.Error(f"Seed must be a non-negative integer or omitted, not {seed}")
+            raise error.Error(
+                f"Seed must be a non-negative integer or omitted, not {seed}")
 
         seed_seq = np.random.SeedSequence(seed)
         np_seed = seed_seq.entropy
         rng = np.random.Generator(np.random.PCG64(seed_seq))
         return rng, np_seed
 
-    def _setup_client_and_physics(
-            self,
-            graphics=False
-    ) -> bullet_client.BulletClient:
+    def _setup_client_and_physics(self,
+                                  graphics=False
+                                  ) -> bullet_client.BulletClient:
         """Creates a PyBullet process instance.
 
         The parameters for the physics simulation are determined by the
@@ -201,8 +205,7 @@ class EnvironmentBuilder(gym.Env):
                 if con_mode == bc.DIRECT:
                     egl = pkgutil.get_loader('eglRenderer')
                     if egl:
-                        bc.loadPlugin(egl.get_filename(),
-                                           "_eglRendererPlugin")
+                        bc.loadPlugin(egl.get_filename(), "_eglRendererPlugin")
                         print('LOADED EGL...')
                     else:
                         bc.loadPlugin("eglRendererPlugin")
@@ -242,7 +245,8 @@ class EnvironmentBuilder(gym.Env):
         if obstacles:
             number_obstacles = [v['number'] for k, v in obstacles.items()]
             self.num_obstacles = sum(number_obstacles)
-            self.obstacles = create_obstacles(self.bc, obstacles,
+            self.obstacles = create_obstacles(self.bc,
+                                              obstacles,
                                               env_dim=self.world.env_dim)
         else:
             self.num_obstacles = 0
@@ -257,10 +261,7 @@ class EnvironmentBuilder(gym.Env):
             self.bc.disconnect()
         self.bullet_client_id = -1
 
-    def get_agent(
-            self,
-            ag: str
-    ) -> bases.Agent:
+    def get_agent(self, ag: str) -> bases.Agent:
         """Instantiate a particular agent class.
 
         Parameters
@@ -289,10 +290,7 @@ class EnvironmentBuilder(gym.Env):
         obs = np.concatenate([agent_obs, task_obs])
         return obs
 
-    def get_task(
-            self,
-            task: str
-    ) -> bases.Task:
+    def get_task(self, task: str) -> bases.Task:
         """Instantiate a particular task class.
 
         Parameters
@@ -308,19 +306,13 @@ class EnvironmentBuilder(gym.Env):
         assert hasattr(tasks, task), f'Task={task} not implemented.'
         task = getattr(tasks, task)
 
-        return task(
-            bc=self.bc,
-            world=self.world,
-            agent=self.agent,
-            obstacles=self.obstacles,
-            use_graphics=self.use_graphics
-        )
+        return task(bc=self.bc,
+                    world=self.world,
+                    agent=self.agent,
+                    obstacles=self.obstacles,
+                    use_graphics=self.use_graphics)
 
-    def get_world(
-            self,
-            name: str,
-            factor: float
-    ) -> bases.World:
+    def get_world(self, name: str, factor: float) -> bases.World:
         """Instantiate the world including ground plane and arena.
 
         Parameters
@@ -339,10 +331,7 @@ class EnvironmentBuilder(gym.Env):
         world = getattr(worlds, name)
         return world(self.bc, global_scaling=factor)
 
-    def step(
-            self,
-            action: np.ndarray
-    ) -> tuple:
+    def step(self, action: np.ndarray) -> tuple:
         """Step the simulation's dynamics once forward.
 
         This method follows the interface of the OpenAI Gym.
@@ -393,10 +382,7 @@ class EnvironmentBuilder(gym.Env):
         next_obs = self.get_observation()
         return next_obs, r, done, info
 
-    def render(
-            self,
-            mode='human'
-    ) -> np.ndarray:
+    def render(self, mode='human') -> np.ndarray:
         """Show PyBullet GUI visualization.
 
         Render function triggers the PyBullet GUI visualization.
@@ -430,16 +416,13 @@ class EnvironmentBuilder(gym.Env):
                 yaw=self.world.camera.cam_yaw,
                 pitch=self.world.camera.cam_pitch,
                 roll=0,
-                upAxisIndex=2
-            )
+                upAxisIndex=2)
             w = float(self.world.camera.render_width)
             h = self.world.camera.render_height
-            proj_matrix = self.bc.computeProjectionMatrixFOV(
-                fov=60,
-                aspect=w / h,
-                nearVal=0.1,
-                farVal=100.0
-            )
+            proj_matrix = self.bc.computeProjectionMatrixFOV(fov=60,
+                                                             aspect=w / h,
+                                                             nearVal=0.1,
+                                                             farVal=100.0)
             (_, _, px, _, _) = self.bc.getCameraImage(
                 width=self.world.camera.render_width,
                 height=self.world.camera.render_height,
@@ -448,8 +431,7 @@ class EnvironmentBuilder(gym.Env):
                 renderer=pb.ER_BULLET_HARDWARE_OPENGL)
 
             new_shape = (self.world.camera.render_height,
-                         self.world.camera.render_width,
-                         -1)
+                         self.world.camera.render_width, -1)
             rgb_array = np.reshape(np.array(px), new_shape)
             rgb_array = rgb_array[:, :, :3]
             return rgb_array
