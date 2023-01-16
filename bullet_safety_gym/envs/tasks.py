@@ -3,7 +3,7 @@ from bullet_safety_gym.envs import env_utils
 from bullet_safety_gym.envs import bases, sensors, agents
 from bullet_safety_gym.envs.obstacles import GoalZone, LineBoundary, CircleZone, \
     Puck, Apple, Bomb
-
+import time
 
 def angle2pos(pos1: np.ndarray, pos2: np.ndarray) -> float:
     """Calculate angle towards a position, e.g. used to determine yaw of agent
@@ -45,6 +45,7 @@ class ReachGoalTask(bases.Task):
         self.equip_agent_with_sensors()
         # increase powers of some agents to improve random exploration
         self.agent.upgrade_power()
+        self.switch_flag = False
 
     def get_xy_distance(self) -> float:
         return np.linalg.norm(
@@ -71,8 +72,10 @@ class ReachGoalTask(bases.Task):
 
         Note that potential-based reward shaping is applied.
         """
+        vel = self.agent.get_linear_velocity()[:2]
         cur_dist = self.get_xy_distance()
-        reward = self.old_dist - cur_dist + 0.01 * self.agent.specific_reward()
+        reward = 3 * (self.old_dist - cur_dist) + 0.01 * self.agent.specific_reward()  # modified, add "10"
+        reward += 0.0 * np.dot(vel, vel)
         self.old_dist = cur_dist
         return reward
 
@@ -99,24 +102,52 @@ class ReachGoalTask(bases.Task):
 
         return achieved
 
+    
+    # def update_goal(self):
+    #     goal_set = False
+    #     while not goal_set:
+    #         new_goal_pos = self.world.generate_random_xyz_position()
+
+    #         min_distance = np.linalg.norm(
+    #                 self.agent.get_position()[:2] - new_goal_pos[:2]
+    #         )
+    #         for obstacle in self.obstacles:
+
+    #             min_distance = min(min_distance, np.linalg.norm(
+    #                 obstacle.get_position()[:2] - new_goal_pos[:2]
+    #             ))
+    #         if min_distance > 1.5:
+    #             self.goal.set_position(new_goal_pos)
+    #             # self.bc.stepSimulation()
+    #             goal_set = True
+    #     self.old_dist = self.get_xy_distance()
+
+    # Modified
     def update_goal(self):
-        goal_set = False
-        while not goal_set:
-            new_goal_pos = self.world.generate_random_xyz_position()
+        case = 1
+        goal_list = []
+        
+        if case==0 and len(self.obstacles)==8:
+            goal_list.append(np.array([5.39871634, -1.80550396, 0.]))
+            goal_list.append(np.array([-1.9616728, 3.34340424, 0. ]))
+            goal_list.append(np.array([-5.39360772, -4.77653244, 0. ]))
+            goal_list.append(np.array([3.43121449, -7.37853809, 0. ]))
+            goal_list.append(np.array([-4.37084707, 3.40952192, 0. ]))
 
-            min_distance = np.linalg.norm(
-                    self.agent.get_position()[:2] - new_goal_pos[:2]
-            )
-            for obstacle in self.obstacles:
+        if case==0:
+            index = np.random.randint(len(goal_list))
+            new_goal_pos = goal_list[index]
 
-                min_distance = min(min_distance, np.linalg.norm(
-                    obstacle.get_position()[:2] - new_goal_pos[:2]
-                ))
-            if min_distance > 1.5:
-                self.goal.set_position(new_goal_pos)
-                # self.bc.stepSimulation()
-                goal_set = True
+        if case==1:
+            if self.switch_flag:
+                new_goal_pos = np.array([6, 6, 0.])
+            else:
+                new_goal_pos = np.array([-6, 6, 0.])
+            self.switch_flag = not self.switch_flag
+
+        self.goal.set_position(new_goal_pos)
         self.old_dist = self.get_xy_distance()
+        
 
     def setup_camera(self) -> None:
         """ Default setting for rendering."""
@@ -127,8 +158,11 @@ class ReachGoalTask(bases.Task):
             cam_pitch=-60
         )
 
+    # Modified
     def specific_reset(self) -> None:
         """ Set positions and orientations of agent and obstacles."""
+
+        case = 2
 
         # set agent and goal positions
         self.agent.specific_reset()
@@ -139,9 +173,85 @@ class ReachGoalTask(bases.Task):
             goal_pos = self.world.generate_random_xyz_position()
         # adjust the height of agent
         # agent_pos = np.concatenate((agent_pos[:2], [self.agent.init_xyz[2]]))
+
+        if len(self.obstacles) > 0:
+            obs_init_pos = env_utils.generate_obstacles_init_pos(
+                num_obstacles=len(self.obstacles),
+                agent_pos=self.agent.get_position(),
+                goal_pos=self.goal.get_position(),
+                world=self.world,
+                min_allowed_distance=self.world.body_min_distance,
+                agent_obstacle_distance=self.agent_obstacle_distance
+            )
+
+        """==================== manual env config case 0 ===================="""
+        if case==2 and len(self.obstacles)==17:
+            agent_pos[0] = -6
+            agent_pos[1] = 6
+            
+            goal_pos[0] = 6
+            goal_pos[1] = 6
+
+            obs_init_pos[0] = np.array([-1, -3, 0])
+            obs_init_pos[1] = np.array([-1, -1, 0])
+            obs_init_pos[2] = np.array([-1, 5, 0])
+            obs_init_pos[3] = np.array([-1, 7, 0])
+            obs_init_pos[4] = np.array([-1, 9, 0])
+
+            obs_init_pos[5] = np.array([1, -3, 0])
+            obs_init_pos[6] = np.array([1, -1, 0])
+            obs_init_pos[7] = np.array([1, 5, 0])
+            obs_init_pos[8] = np.array([1, 7, 0])
+            obs_init_pos[9] = np.array([1, 9, 0])
+            obs_init_pos[10] = np.array([1, 3, 0])
+            
+            obs_init_pos[11] = np.array([-5, 0, 0])
+            obs_init_pos[12] = np.array([-6, -1, 0])
+
+            obs_init_pos[13] = np.array([5, 0, 0])
+            obs_init_pos[14] = np.array([6, -1, 0])
+
+            obs_init_pos[15] = np.array([-1, -6, 0])
+            obs_init_pos[16] = np.array([1, -6, 0])
+        """==================== manual env config ===================="""
+
+        if case==1 and len(self.obstacles)==8:
+            obs_init_pos = np.array(
+                [
+                    [-3.71306196, -6.84261883, 0. ], 
+                    [-6.02764665, 4.76413355, 0. ], 
+                    [5.36287523, -6.69417348, 0. ], 
+                    [2.95492326, -1.76170127, 0. ], 
+                    [ 0.57202942, -5.75163324, 0. ], 
+                    [3.86811716, 2.01580114, 0. ], 
+                    [-0.86291554, 6.56008828, 0. ], 
+                    [3.48356762, 4.53764469, 0. ]
+                ]
+            )
+
+        if case==0 and len(self.obstacles)==8:
+            obs_init_pos = np.array(
+                [
+                    [-6.9578114 , 6.45111313, 0. ], 
+                    [-1.62946123, 5.21180206, 0. ], 
+                    [-5.86277623, -1.6027478 , 0. ], 
+                    [-2.7549579 , -5.65845968, 0. ], 
+                    [5.52662736, 5.77132451, 0. ], 
+                    [ 2.4359772 , -4.77035544, 0. ], 
+                    [-1.72045757, -3.31632183, 0. ], 
+                    [0.54713555, 4.98305762, 0. ]
+                ]
+            )
+
         self.agent.set_position(agent_pos)
         self.goal.set_position(goal_pos)
         self.old_dist = self.get_xy_distance()
+        self.update_goal()
+
+        # for _ in range(10):
+        #     self.update_goal()
+        #     time.sleep(0.1)
+        
 
         # set agent orientation towards goal
         yaw = angle2pos(self.agent.get_position(), self.goal.get_position())
@@ -152,17 +262,11 @@ class ReachGoalTask(bases.Task):
         self.agent.set_orientation(quaternion)
 
         # reset obstacle positions
-        if len(self.obstacles) > 0:
-            obs_init_pos = env_utils.generate_obstacles_init_pos(
-                num_obstacles=len(self.obstacles),
-                agent_pos=self.agent.get_position(),
-                goal_pos=self.goal.get_position(),
-                world=self.world,
-                min_allowed_distance=self.world.body_min_distance,
-                agent_obstacle_distance=self.agent_obstacle_distance
-            )
+        if len(self.obstacles) > 0:           
             for i in range(len(self.obstacles)):
                 self.obstacles[i].set_position(obs_init_pos[i])
+
+        # print(obs_init_pos)
 
 
 class PushTask(bases.Task):

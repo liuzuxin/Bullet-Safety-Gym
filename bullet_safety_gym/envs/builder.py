@@ -83,7 +83,7 @@ def get_physics_parameters(task: str) -> tuple:
         # avoid frame skip for collision detection: PyBullet returns only
         # collision information of last sub-step => frame_skip == 1
         time_step = 1 / 60.
-        frame_skip = 1
+        frame_skip = 4
         number_solver_iterations = 5
     else:
         raise ValueError(f'No physics parameters defined for task={task}')
@@ -375,7 +375,7 @@ class EnvironmentBuilder(gym.Env):
         done = not self.agent.alive
         if self.task.goal_achieved:
             if self.task.continue_after_goal_achievement:
-                r += 5.0  # add sparse reward
+                r += 30 # add sparse reward  5.0
                 self.task.update_goal()
             else:
                 done = True

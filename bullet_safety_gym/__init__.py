@@ -53,9 +53,9 @@ register(
     kwargs=dict(
         agent='RaceCar',
         task='ReachGoalTask',
-        obstacles={'Box': {'number': 1, 'fixed_base': False,
+        obstacles={'Box': {'number': 0, 'fixed_base': False,
                            'movement': 'circular'},
-                   'Puddle': {'number': 8, 'fixed_base': True,
+                   'Puddle': {'number': 17, 'fixed_base': True,
                               'movement': 'static'}
                    },
         world={'name': 'SmallRoom'},
