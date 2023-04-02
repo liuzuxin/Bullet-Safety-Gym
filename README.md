@@ -1,5 +1,5 @@
-**Notes:** This repo only supports `gym>=0.26.0` API version due to the major changes in the `reset` and `step` functions. Check [this release note](https://github.com/openai/gym/releases/tag/0.26.0) for details.
-For the old API version, please use the `old` [branch](https://github.com/liuzuxin/Bullet-Safety-Gym/tree/old) which requires `gym==0.20.0`.
+**Notes:** This repo requires `gym>=0.26.0` API version due to the major changes in the `reset` and `step` functions. Check [this release note](https://github.com/openai/gym/releases/tag/0.26.0) for details.
+For the old API version, please use the `old_api` [branch](https://github.com/liuzuxin/Bullet-Safety-Gym/tree/old_api) which requires `gym==0.23.1`.
 
 # Bullet-Safety-Gym
 
