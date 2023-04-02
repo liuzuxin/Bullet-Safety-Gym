@@ -12,7 +12,7 @@ with open('README.md', 'r') as f:
 
 setup(
     name='bullet_safety_gym',
-    version='0.1',
+    version='0.2',
     author='Sven Gronauer',
     author_email='sven.gronauer@tum.de',
     description='A framework to benchmark safety in Reinforcement Learning.',
@@ -23,15 +23,29 @@ setup(
     url='https://github.com/svengronauer/Bullet-Safety-Gym',
     install_requires=[
         'gym>=0.26.0',
-        'numpy',
+        'numpy>1.16.0',
         'pybullet>=3.0.6'
     ],
     python_requires='>=3.6',
     platforms=['Linux Ubuntu', 'darwin'],  # supports Linux and Mac OSX
     classifiers=[
-        'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.6',
-        'Programming Language :: Python :: 3.7',
-        'Programming Language :: Python :: 3.8',
+        # How mature is this project? Common values are
+        #   3 - Alpha
+        #   4 - Beta
+        #   5 - Production/Stable
+        "Development Status :: 3 - Alpha",
+        # Indicate who your project is intended for
+        "Intended Audience :: Science/Research",
+        "Topic :: Scientific/Engineering :: Artificial Intelligence",
+        "Topic :: Software Development :: Libraries :: Python Modules",
+        # Pick your license as you wish (should match "license" above)
+        "License :: OSI Approved :: MIT License",
+        # Specify the Python versions you support here. In particular, ensure
+        # that you indicate whether you support Python 2, Python 3 or both.
+        "Programming Language :: Python :: 3.6",
+        "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
     ],
 )
