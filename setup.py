@@ -11,7 +11,7 @@ with open('README.md', 'r') as f:
 
 setup(
     name='bullet_safety_gym',
-    version='0.2',
+    version='0.2.0',
     author='Sven Gronauer',
     author_email='sven.gronauer@tum.de',
     description='A framework to benchmark safety in Reinforcement Learning.',
