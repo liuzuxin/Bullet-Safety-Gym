@@ -11,7 +11,7 @@ with open('README.md', 'r') as f:
 
 setup(
     name='bullet_safety_gym',
-    version='1.0.1',
+    version='1.1.0',
     author='Sven Gronauer',
     author_email='sven.gronauer@tum.de',
     description='A framework to benchmark safety in Reinforcement Learning.',
@@ -23,7 +23,7 @@ setup(
         'bullet_safety_gym.envs': ['data/**/*'],
     },
     license='MIT license',
-    url='https://github.com/svengronauer/Bullet-Safety-Gym',
+    url='https://github.com/liuzuxin/Bullet-Safety-Gym',
     install_requires=['gym>=0.26.0', 'numpy>1.16.0', 'pybullet>=3.0.6'],
     python_requires='>=3.6',
     platforms=['Linux Ubuntu', 'darwin'],  # supports Linux and Mac OSX
