@@ -9,7 +9,6 @@ with open('README.md', 'r') as f:
     # description from readme file
     long_description = f.read()
 
-
 setup(
     name='bullet_safety_gym',
     version='0.2',
@@ -19,13 +18,13 @@ setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     packages=find_packages(),
+    include_package_data=True,
+    package_data={
+        'bullet_safety_gym.envs': ['data/*'],
+    },
     license='MIT license',
     url='https://github.com/svengronauer/Bullet-Safety-Gym',
-    install_requires=[
-        'gym>=0.26.0',
-        'numpy>1.16.0',
-        'pybullet>=3.0.6'
-    ],
+    install_requires=['gym>=0.26.0', 'numpy>1.16.0', 'pybullet>=3.0.6'],
     python_requires='>=3.6',
     platforms=['Linux Ubuntu', 'darwin'],  # supports Linux and Mac OSX
     classifiers=[
