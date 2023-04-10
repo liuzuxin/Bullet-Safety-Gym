@@ -1,5 +1,6 @@
-**Notes:** This repo requires `gym>=0.26.0` API version due to the major changes in the `reset` and `step` functions. Check [this release note](https://github.com/openai/gym/releases/tag/0.26.0) for details.
-For the old API version, please use the `old_api` [branch](https://github.com/liuzuxin/Bullet-Safety-Gym/tree/old_api) which requires `gym==0.23.1`.
+**Notes:** This repo requires `gymnasium>=0.26.3` API version due to the major changes in the `reset` and `step` functions.  Check [this release note](https://gymnasium.farama.org/content/migration-guide/) for details.
+For `gym>=0.26` version, please use the `gym-v26` [branch](https://github.com/liuzuxin/Bullet-Safety-Gym/tree/gym-v26).
+For the old API (`gym<0.26`) version, please use the `old_api` [branch](https://github.com/liuzuxin/Bullet-Safety-Gym/tree/old_api) which requires `gym==0.23.1`.
 
 # Bullet-Safety-Gym
 
@@ -124,7 +125,7 @@ environments can be simply instantiated via `gym.make`. See:
 ```
 >>> import gym
 >>> import bullet_safety_gym
->>> env = gym.make('SafetyCarGather-v0')
+>>> env = gym.make('SafetyCarCircle-v0')
 ```
 
 The functional interface follows the API of the OpenAI Gym that is or greater than the `0.26.0` version. There are major changes of the `reset` and `step` functions. Check [this release note](https://github.com/openai/gym/releases/tag/0.26.0) for details. 

@@ -6,13 +6,15 @@
 
     Many parts are inspired by the PyBullet Repository, credits to Erwin Coumans
 """
-import os
-import pybullet as pb
-import numpy as np
 import abc
-from bullet_safety_gym.envs import sensors
-from pybullet_utils import bullet_client
+import os
 import time
+
+import numpy as np
+import pybullet as pb
+from pybullet_utils import bullet_client
+
+from bullet_safety_gym.envs import sensors
 
 
 def get_data_path() -> str:
@@ -39,16 +41,14 @@ class Joint(object):
         "SPHERICAL": 2
     }
 
-    def __init__(
-            self,
-            bc: bullet_client.BulletClient,
-            body_id: int,
-            joint_index: int,
-            power: float = 1.0,
-            max_force=None,
-            max_velocity=None,
-            debug=False
-    ):
+    def __init__(self,
+                 bc: bullet_client.BulletClient,
+                 body_id: int,
+                 joint_index: int,
+                 power: float = 1.0,
+                 max_force=None,
+                 max_velocity=None,
+                 debug=False):
         self.bc = bc
         self.body_id = body_id
         self.index = joint_index
@@ -56,8 +56,8 @@ class Joint(object):
         jointInfo = self.bc.getJointInfo(body_id, joint_index)
         self.name = jointInfo[1].decode("utf-8")
         t = jointInfo[2]
-        self.type = list(Joint.types.keys())[
-            list(Joint.types.values()).index(t)]
+        self.type = list(Joint.types.keys())[list(
+            Joint.types.values()).index(t)]
         self.damping = jointInfo[6]
         self.friction = jointInfo[7]
         self.lower_limit = jointInfo[8]
@@ -79,8 +79,6 @@ class Joint(object):
         """
 
         """
-
-
         """ Check if torque can be applied to joint.
 
         Note:
@@ -91,28 +89,20 @@ class Joint(object):
         controllable = True if self.type in controllable_types else False
         return controllable
 
-    def disable_motor(
-            self
-    ) -> None:
+    def disable_motor(self) -> None:
         """Makes this joint freely movable."""
-        self.bc.setJointMotorControl2(
-            self.body_id,
-            self.index,
-            controlMode=pb.POSITION_CONTROL,
-            targetPosition=0,
-            targetVelocity=0,
-            positionGain=0.1,
-            velocityGain=0.1,
-            force=0
-        )
+        self.bc.setJointMotorControl2(self.body_id,
+                                      self.index,
+                                      controlMode=pb.POSITION_CONTROL,
+                                      targetPosition=0,
+                                      targetVelocity=0,
+                                      positionGain=0.1,
+                                      velocityGain=0.1,
+                                      force=0)
 
     def disable_torque_sensor(self) -> None:
         """Disable the torque sensor of this joint."""
-        self.bc.enableJointForceTorqueSensor(
-            self.body_id,
-            self.index,
-            0
-        )
+        self.bc.enableJointForceTorqueSensor(self.body_id, self.index, 0)
         self.has_torque_sensor = False
 
     def enable_torque_control(self):
@@ -122,21 +112,15 @@ class Joint(object):
         the torque control mode.
         """
         if self.type in ['PRISMATIC', 'REVOLUTE']:
-            self.bc.setJointMotorControl2(
-                self.body_id,
-                self.index,
-                self.bc.VELOCITY_CONTROL,
-                force=0
-            )
+            self.bc.setJointMotorControl2(self.body_id,
+                                          self.index,
+                                          self.bc.VELOCITY_CONTROL,
+                                          force=0)
 
     def enable_torque_sensor(self) -> None:
         """Enable the torque sensor for joint."""
         if not self.has_torque_sensor:
-            self.bc.enableJointForceTorqueSensor(
-                self.body_id,
-                self.index,
-                1
-            )
+            self.bc.enableJointForceTorqueSensor(self.body_id, self.index, 1)
         self.has_torque_sensor = True
 
     def get_relative_position(self) -> tuple:
@@ -149,9 +133,7 @@ class Joint(object):
 
     def get_state(self) -> np.ndarray:
         """Returns the 2-dim vector (position, velocity) of this joint."""
-        x, vx, *_ = self.bc.getJointState(
-            self.body_id,
-            self.index)
+        x, vx, *_ = self.bc.getJointState(self.body_id, self.index)
         return np.array([x, vx])
 
     def get_position(self) -> float:
@@ -165,14 +147,12 @@ class Joint(object):
     def init_motor(self) -> None:
         """Initialize joints in position control mode. The zero force makes them
         freely movable."""
-        self.bc.setJointMotorControl2(
-            self.body_id,
-            self.index,
-            pb.POSITION_CONTROL,
-            positionGain=0.1,
-            velocityGain=0.1,
-            force=0
-        )
+        self.bc.setJointMotorControl2(self.body_id,
+                                      self.index,
+                                      pb.POSITION_CONTROL,
+                                      positionGain=0.1,
+                                      velocityGain=0.1,
+                                      force=0)
 
     def print_information(self) -> None:
         """Debug print joint information to console."""
@@ -184,8 +164,7 @@ class Joint(object):
         print(f' maximum force: \t \t{self.max_force}')
 
     def reset_position_and_disable_motor(self, position, velocity):
-        self.set_state(position=position,
-                       velocity=velocity)
+        self.set_state(position=position, velocity=velocity)
         self.disable_motor()
 
     def set_position(
@@ -194,13 +173,11 @@ class Joint(object):
     ) -> None:
         """Switches joint into position control mode and sets target position.
         """
-        self.bc.setJointMotorControl2(
-            self.body_id,
-            self.index,
-            pb.POSITION_CONTROL,
-            targetPosition=position,
-            force=self.max_force
-        )
+        self.bc.setJointMotorControl2(self.body_id,
+                                      self.index,
+                                      pb.POSITION_CONTROL,
+                                      targetPosition=position,
+                                      force=self.max_force)
 
     def set_state(
             self,
@@ -209,60 +186,42 @@ class Joint(object):
     ):
         """Set joint to target position and velocity.
         Note: this overrides the physics simulation."""
-        self.bc.resetJointState(
-            self.body_id,
-            self.index,
-            targetValue=position,
-            targetVelocity=velocity
-        )
+        self.bc.resetJointState(self.body_id,
+                                self.index,
+                                targetValue=position,
+                                targetVelocity=velocity)
 
     def get_torque(self) -> float:
         """Measures the applied force to the joint."""
         msg = f'Torque sensor not enabled for {self.name}'
         assert self.has_torque_sensor, msg
-        *_, applied_torque = self.bc.getJointState(
-            self.body_id,
-            self.index)
+        *_, applied_torque = self.bc.getJointState(self.body_id, self.index)
         return applied_torque
 
-    def set_torque(
-            self,
-            torque: float
-    ) -> None:
+    def set_torque(self, torque: float) -> None:
         """Switches joint into torque control mode and sets target torque."""
-        self.bc.setJointMotorControl2(
-            bodyIndex=self.body_id,
-            jointIndex=self.index,
-            controlMode=pb.TORQUE_CONTROL,
-            force=torque
-        )
+        self.bc.setJointMotorControl2(bodyIndex=self.body_id,
+                                      jointIndex=self.index,
+                                      controlMode=pb.TORQUE_CONTROL,
+                                      force=torque)
 
-    def set_velocity(
-            self,
-            velocity: float
-    ) -> None:
+    def set_velocity(self, velocity: float) -> None:
         """Switches joint into velocity control mode and sets target velocity.
         """
-        self.bc.setJointMotorControl2(
-            self.body_id,
-            self.index,
-            pb.VELOCITY_CONTROL,
-            targetVelocity=velocity,
-            force=self.max_force
-        )
+        self.bc.setJointMotorControl2(self.body_id,
+                                      self.index,
+                                      pb.VELOCITY_CONTROL,
+                                      targetVelocity=velocity,
+                                      force=self.max_force)
 
 
 class Link(object):
     """A convenient wrapper to access link information of the Bullet simulator.
     Many parts of this class are inspired by the PyBullet repository.
     """
-    def __init__(
-            self,
-            bc: bullet_client.BulletClient,
-            name: bytearray,
-            body_id: int,
-            link_index: int
-    ):
+
+    def __init__(self, bc: bullet_client.BulletClient, name: bytearray,
+                 body_id: int, link_index: int):
         self.bc = bc
         self.name = name.decode("utf-8")
         self.body_id = body_id
@@ -276,9 +235,7 @@ class Link(object):
         of the simulation. Note that pb.getContactPoints() returns the contact
         points computed during the most recent call to pb.stepSimulation().
         """
-        return self.bc.getContactPoints(
-            self.body_id, -1,
-            self.index, -1)
+        return self.bc.getContactPoints(self.body_id, -1, self.index, -1)
 
     def get_state(self) -> np.ndarray:
         """Returns the state of the link as 12-dim vector."""
@@ -341,33 +298,24 @@ class Link(object):
         """Reset the orientation of the link. This overrides physics simulation
         and should be called at episode reset."""
         assert self.index < 0, 'reset_pose() is only implemented for base link.'
-        self.bc.resetBasePositionAndOrientation(
-            self.body_id,
-            self.get_position(),
-            orientation)
+        self.bc.resetBasePositionAndOrientation(self.body_id,
+                                                self.get_position(),
+                                                orientation)
 
     def reset_velocity(self,
                        linear_velocity=[0, 0, 0],
-                       angular_velocity=[0, 0, 0]
-                       ) -> None:
+                       angular_velocity=[0, 0, 0]) -> None:
         """Reset the linear and angular velocities of the link. This overrides
         physics simulation and should be called at episode restart."""
-        self.bc.resetBaseVelocity(
-            self.body_id,
-            linear_velocity,
-            angular_velocity)
+        self.bc.resetBaseVelocity(self.body_id, linear_velocity,
+                                  angular_velocity)
 
-    def reset_pose(self,
-                   position: np.ndarray,
-                   orientation: np.ndarray
-                   ):
+    def reset_pose(self, position: np.ndarray, orientation: np.ndarray):
         """Reset the position and orientation of the link. This overrides the
         physics simulation and should be called at episode restart."""
         assert self.index < 0, 'reset_pose() is only implemented for base link.'
-        self.bc.resetBasePositionAndOrientation(
-            self.body_id,
-            position,
-            orientation)
+        self.bc.resetBasePositionAndOrientation(self.body_id, position,
+                                                orientation)
 
 
 class Body(object):
@@ -376,20 +324,18 @@ class Body(object):
         body_id -1.
     """
 
-    def __init__(
-            self,
-            bc: bullet_client.BulletClient,
-            name: str,
-            file_name: str,
-            init_color: tuple = (1., 1., 1, 1.0),
-            init_xyz: tuple = (0., 0., 0.),
-            init_orientation: tuple = (0., 0., 0.),
-            fixed_base=False,
-            global_scaling=1,
-            self_collision=False,
-            verbose=False,
-            debug=False
-    ):
+    def __init__(self,
+                 bc: bullet_client.BulletClient,
+                 name: str,
+                 file_name: str,
+                 init_color: tuple = (1., 1., 1, 1.0),
+                 init_xyz: tuple = (0., 0., 0.),
+                 init_orientation: tuple = (0., 0., 0.),
+                 fixed_base=False,
+                 global_scaling=1,
+                 self_collision=False,
+                 verbose=False,
+                 debug=False):
         assert len(init_orientation) == 3, 'init_orientation expects (r,p,y)'
         assert len(init_xyz) == 3
         self.bc = bc
@@ -429,26 +375,22 @@ class Body(object):
             flags = 0  # zero means no flags are set
             if self.self_collision:
                 flags = pb.URDF_USE_SELF_COLLISION  # | pb.URDF_USE_SELF_COLLISION_INCLUDE_PARENT
-            body_id = self.bc.loadURDF(
-                self.file_name_path,
-                self.init_xyz,
-                self.init_orientation,
-                globalScaling=self.global_scaling,
-                useFixedBase=self.fixed_base,
-                flags=flags
-            )
+            body_id = self.bc.loadURDF(self.file_name_path,
+                                       self.init_xyz,
+                                       self.init_orientation,
+                                       globalScaling=self.global_scaling,
+                                       useFixedBase=self.fixed_base,
+                                       flags=flags)
         elif file_type == 'xml':
             msg = f'global scaling is not supported for MJCF files!'
             assert self.global_scaling == 1, msg
             if self.self_collision:
                 body_id = self.bc.loadMJCF(
                     self.file_name_path,
-                    flags=self.bc.URDF_USE_SELF_COLLISION |
-                          self.bc.URDF_USE_SELF_COLLISION_EXCLUDE_ALL_PARENTS)
+                    flags=self.bc.URDF_USE_SELF_COLLISION
+                    | self.bc.URDF_USE_SELF_COLLISION_EXCLUDE_ALL_PARENTS)
             else:
-                body_id = self.bc.loadMJCF(
-                    self.file_name_path
-                )
+                body_id = self.bc.loadMJCF(self.file_name_path)
             # loadMJCF returns tuple instead of integer
             if isinstance(body_id, tuple):
                 body_id = body_id[0]
@@ -458,24 +400,20 @@ class Body(object):
         assert body_id >= 0, msg
         return body_id
 
-    def apply_external_force(
-            self,
-            force=np.zeros(3),
-            link_id=-1,
-            position=None,
-            frame=pb.WORLD_FRAME
-    ) -> None:
+    def apply_external_force(self,
+                             force=np.zeros(3),
+                             link_id=-1,
+                             position=None,
+                             frame=pb.WORLD_FRAME) -> None:
         """Set force to given link of body. Note that applied external forces 
         are set to zero after PyBullet simulation step. 
         """
-        assert force.ndim == 1 and force.shape == (3,)
-        self.bc.applyExternalForce(
-            self.body_id,
-            link_id,
-            force,
-            posObj=position,
-            flags=frame
-        )
+        assert force.ndim == 1 and force.shape == (3, )
+        self.bc.applyExternalForce(self.body_id,
+                                   link_id,
+                                   force,
+                                   posObj=position,
+                                   flags=frame)
 
     def get_state(self):
         """Returns position and velocity of the base link."""
@@ -511,43 +449,29 @@ class Body(object):
         return self.visible
 
     def set_mass(self, mass):
-        self.bc.changeDynamics(
-            self.body_id,
-            linkIndex=-1,
-            mass=mass
-        )
+        self.bc.changeDynamics(self.body_id, linkIndex=-1, mass=mass)
 
-    def set_position(self,
-                     position
-                     ) -> None:
+    def set_position(self, position) -> None:
         """Reset the base of the object at the specified position in world space
         coordinates [X,Y,Z].
         """
         quaternion_orient = pb.getQuaternionFromEuler(self.get_orientation())
-        self.bc.resetBasePositionAndOrientation(
-            self.body_id,
-            position,
-            quaternion_orient)
+        self.bc.resetBasePositionAndOrientation(self.body_id, position,
+                                                quaternion_orient)
 
-    def set_orientation(self,
-                        orientation: tuple
-                        ) -> None:
+    def set_orientation(self, orientation: tuple) -> None:
         """Reset body at the specified orientation as world space quaternion
         [X,Y,Z,W] """
         assert len(orientation) == 4, 'expecting quaternion'
-        self.bc.resetBasePositionAndOrientation(
-            self.body_id,
-            self.get_position(),
-            orientation)
+        self.bc.resetBasePositionAndOrientation(self.body_id,
+                                                self.get_position(),
+                                                orientation)
 
     def set_velocity(self,
                      linear_velocity=[0, 0, 0],
-                     angular_velocity=[0, 0, 0]
-                     ) -> None:
-        self.bc.resetBaseVelocity(
-            self.body_id,
-            linear_velocity,
-            angular_velocity)
+                     angular_velocity=[0, 0, 0]) -> None:
+        self.bc.resetBaseVelocity(self.body_id, linear_velocity,
+                                  angular_velocity)
 
     def print_information(self):
         print('=' * 35)
@@ -562,39 +486,36 @@ class Agent(Body):
     interface to exert control commands (so-called actions) to the agent and
     retain information such as rewards, costs, contact information, etc.
     """
-    def __init__(
-            self,
-            bc: bullet_client.BulletClient,
-            name,
-            file_name,
-            act_dim,
-            collision_radius: float,
-            obs_dim,
-            init_xyz,
-            max_force: float,
-            velocity_constraint: float,
-            init_orientation: tuple = (0., 0., 0.),
-            fixed_base=False,
-            global_scaling=1,
-            violation_shape_factor=1.5,
-            self_collision=True,
-            max_velocity=None,
-            debug=False,
-            **kwargs
-    ):
-        Body.__init__(
-            self,
-            bc=bc,
-            name=name,
-            file_name=file_name,
-            init_xyz=init_xyz,
-            init_orientation=init_orientation,
-            fixed_base=fixed_base,
-            global_scaling=global_scaling,
-            self_collision=self_collision,
-            debug=debug,
-            **kwargs
-        )
+
+    def __init__(self,
+                 bc: bullet_client.BulletClient,
+                 name,
+                 file_name,
+                 act_dim,
+                 collision_radius: float,
+                 obs_dim,
+                 init_xyz,
+                 max_force: float,
+                 velocity_constraint: float,
+                 init_orientation: tuple = (0., 0., 0.),
+                 fixed_base=False,
+                 global_scaling=1,
+                 violation_shape_factor=1.5,
+                 self_collision=True,
+                 max_velocity=None,
+                 debug=False,
+                 **kwargs):
+        Body.__init__(self,
+                      bc=bc,
+                      name=name,
+                      file_name=file_name,
+                      init_xyz=init_xyz,
+                      init_orientation=init_orientation,
+                      fixed_base=fixed_base,
+                      global_scaling=global_scaling,
+                      self_collision=self_collision,
+                      debug=debug,
+                      **kwargs)
         self.velocity_constraint = velocity_constraint
 
         # space information
@@ -637,19 +558,16 @@ class Agent(Body):
             baseMass=0,
             baseCollisionShapeIndex=-1,
             baseVisualShapeIndex=self.violation_shape,
-            basePosition=self.get_position()
-        )
+            basePosition=self.get_position())
 
     def _collect_information(self):
         """Collect joint information about the robot during initialization."""
         for i in range(self.num_joints):
-            joint = Joint(
-                bc=self.bc,
-                body_id=self.body_id,
-                joint_index=i,
-                max_force=self.max_force,
-                max_velocity=self.max_velocity
-            )
+            joint = Joint(bc=self.bc,
+                          body_id=self.body_id,
+                          joint_index=i,
+                          max_force=self.max_force,
+                          max_velocity=self.max_velocity)
             self.joint_list.append(joint)
             self.joint_dict[joint.name] = joint
             if joint.controllable and not joint.name.startswith('jointfix') \
@@ -658,12 +576,10 @@ class Agent(Body):
                 self.motor_dict[joint.name] = joint
             else:
                 joint.disable_motor()
-            link = Link(
-                bc=self.bc,
-                name=joint.child_link_name,
-                body_id=self.body_id,
-                link_index=i
-            )
+            link = Link(bc=self.bc,
+                        name=joint.child_link_name,
+                        body_id=self.body_id,
+                        link_index=i)
             self.link_list.append(link)
             self.link_dict[link.name] = link
 
@@ -672,12 +588,10 @@ class Agent(Body):
                 self.root_link = link
 
             if i == 0 and self.root_link is None:
-                link = Link(
-                    bc=self.bc,
-                    name=self.robot_name.encode('utf-8'),
-                    body_id=self.body_id,
-                    link_index=-1
-                )
+                link = Link(bc=self.bc,
+                            name=self.robot_name.encode('utf-8'),
+                            body_id=self.body_id,
+                            link_index=-1)
                 print('Root Link:', link.name) if self.debug else None
                 self.root_link = link
                 self.link_list.append(link)
@@ -703,10 +617,7 @@ class Agent(Body):
         """Returns "False" if the agent died, "True" otherwise."""
         raise NotImplementedError
 
-    def apply_action(
-            self,
-            action: np.ndarray
-    ) -> np.ndarray:
+    def apply_action(self, action: np.ndarray) -> np.ndarray:
         """Exert control inputs on the agent's joints. This parent class
         performs a clipping of actions into the interval [-1, +1]."""
         assert np.isfinite(action).all()
@@ -768,35 +679,27 @@ class Agent(Body):
         actions."""
         pass
 
-    def violates_constraints(
-            self,
-            does_violate_constraint
-    ) -> None:
+    def violates_constraints(self, does_violate_constraint) -> None:
         """Displays a red sphere which indicates the receiving of costs when
         enable is True, else deactivate visual shape.
         """
         # update position
-        self.bc.resetBasePositionAndOrientation(
-            self.violation_body_id,
-            self.get_position(),
-            [0, 0, 0, 1])
+        self.bc.resetBasePositionAndOrientation(self.violation_body_id,
+                                                self.get_position(),
+                                                [0, 0, 0, 1])
 
         if self._violates_constraints:
             if not does_violate_constraint:
                 # make collision visual transparent
-                self.bc.changeVisualShape(
-                    self.violation_body_id,
-                    -1,
-                    rgbaColor=[1, 0, 0, 0.0]
-                )
+                self.bc.changeVisualShape(self.violation_body_id,
+                                          -1,
+                                          rgbaColor=[1, 0, 0, 0.0])
         else:
             if does_violate_constraint:
                 # display constraint violation visual shape
-                self.bc.changeVisualShape(
-                    self.violation_body_id,
-                    -1,
-                    rgbaColor=[1, 0, 0, 0.5]
-                )
+                self.bc.changeVisualShape(self.violation_body_id,
+                                          -1,
+                                          rgbaColor=[1, 0, 0, 0.5])
         self._violates_constraints = does_violate_constraint
 
     @property
@@ -823,18 +726,15 @@ class Obstacle(Body):
                  init_orientation=(0., 0., 0),
                  init_color=(1., 1., 1, 1.0),
                  movement='static',
-                 owns_collision_shape=True
-                 ):
-        super().__init__(
-            bc=bc,
-            name=name,
-            file_name=file_name,
-            init_xyz=init_xyz,
-            fixed_base=fixed_base,
-            global_scaling=global_scaling,
-            init_color=init_color,
-            init_orientation=init_orientation
-        )
+                 owns_collision_shape=True):
+        super().__init__(bc=bc,
+                         name=name,
+                         file_name=file_name,
+                         init_xyz=init_xyz,
+                         fixed_base=fixed_base,
+                         global_scaling=global_scaling,
+                         init_color=init_color,
+                         init_orientation=init_orientation)
         self.owns_collision_shape = owns_collision_shape
         self.movement = movement
         # use offset such that objects exhibit different movement patterns
@@ -855,11 +755,12 @@ class Obstacle(Body):
             r = 0.7
             vel_factor = 1
             t = self.movement_offset
-            circle_vec = np.array([np.sin(vel_factor * (time.time() + t)),
-                                   np.cos(vel_factor * (time.time() + t)), 0])
+            circle_vec = np.array([
+                np.sin(vel_factor * (time.time() + t)),
+                np.cos(vel_factor * (time.time() + t)), 0
+            ])
             target_pos = np.array(self.init_xyz) + r * circle_vec
-            self.bc.changeConstraint(self.constraint,
-                                     target_pos)
+            self.bc.changeConstraint(self.constraint, target_pos)
 
     @abc.abstractmethod
     def detect_collision(self, agent: Agent) -> bool:
@@ -871,9 +772,7 @@ class Obstacle(Body):
         treatment, e.g. puddle obstacles."""
         return None
 
-    def set_position(self,
-                     position
-                     ) -> None:
+    def set_position(self, position) -> None:
         """Reset the base of the object at the specified position in world space
         coordinates [X,Y,Z].
         """
@@ -886,30 +785,27 @@ class Obstacle(Body):
         if self.is_visible and not make_visible:
             # make obstacle invisible
             self.visible = False
-            self.bc.changeVisualShape(
-                self.body_id,
-                -1,
-                rgbaColor=[1, 1, 1, 0.0])
+            self.bc.changeVisualShape(self.body_id,
+                                      -1,
+                                      rgbaColor=[1, 1, 1, 0.0])
         if not self.is_visible and make_visible:
             # make object visible again
             self.visible = True
-            self.bc.changeVisualShape(
-                self.body_id,
-                -1,
-                rgbaColor=self.init_color)
+            self.bc.changeVisualShape(self.body_id,
+                                      -1,
+                                      rgbaColor=self.init_color)
 
 
 class Task(abc.ABC):
-    def __init__(
-            self,
-            bc: bullet_client.BulletClient,
-            world,
-            agent: Agent,
-            obstacles: list,
-            continue_after_goal_achievement: bool,
-            use_graphics: bool,
-            agent_obstacle_distance: float = 2.5
-    ):
+
+    def __init__(self,
+                 bc: bullet_client.BulletClient,
+                 world,
+                 agent: Agent,
+                 obstacles: list,
+                 continue_after_goal_achievement: bool,
+                 use_graphics: bool,
+                 agent_obstacle_distance: float = 2.5):
         self.agent = agent
         self.agent_obstacle_distance = agent_obstacle_distance
         self.bc = bc
@@ -941,22 +837,22 @@ class Task(abc.ABC):
         if any(collision_shapes):
             # add LIDAR sensor to agent if obstacles with collision shapes are
             # present
-            sensor = getattr(sensors, 'LIDARSensor')(
-                bc=self.bc,
-                agent=self.agent,
-                obstacles=self.obstacles,
-                number_rays=24,
-                ray_length=self.world.env_dim / 2,
-                visualize=self.use_graphics
-            )
+            sensor = getattr(sensors,
+                             'LIDARSensor')(bc=self.bc,
+                                            agent=self.agent,
+                                            obstacles=self.obstacles,
+                                            number_rays=24,
+                                            ray_length=self.world.env_dim / 2,
+                                            visualize=self.use_graphics)
             self.agent.add_sensor(sensor)
         # check if at least one obstacle without collision shape is present
         if len(collision_shapes) > 0 and False in collision_shapes:
             sensor = getattr(sensors, 'PseudoLIDARSensor')(
                 bc=self.bc,
                 agent=self.agent,
-                obstacles=[o for o in self.obstacles if
-                           not o.owns_collision_shape],
+                obstacles=[
+                    o for o in self.obstacles if not o.owns_collision_shape
+                ],
                 number_rays=24,
                 ray_length=self.world.env_dim / 2,
                 visualize=False  # Pseudo rays are not rendered in GUI
@@ -995,6 +891,7 @@ class Task(abc.ABC):
 
 
 class World:
+
     def __init__(self,
                  bc: bullet_client.BulletClient,
                  global_scaling: float,
@@ -1005,13 +902,11 @@ class World:
         self.body_min_distance = body_min_distance
 
         # setup render settings: default setup is suitable for the run tasks
-        self.camera = Camera(
-            bc=bc,
-            cam_base_pos=(-3, 0, 0),
-            cam_dist=16 * global_scaling,
-            cam_yaw=0,
-            cam_pitch=-89
-        )
+        self.camera = Camera(bc=bc,
+                             cam_base_pos=(-3, 0, 0),
+                             cam_dist=16 * global_scaling,
+                             cam_yaw=0,
+                             cam_pitch=-89)
         self.env_dim = env_dim
 
     @abc.abstractmethod
@@ -1020,6 +915,7 @@ class World:
 
 
 class Camera:
+
     def __init__(self,
                  bc: bullet_client.BulletClient,
                  cam_base_pos: tuple,
@@ -1027,8 +923,7 @@ class Camera:
                  cam_yaw: float,
                  cam_pitch: float,
                  render_width: int = 480,
-                 render_height: int = 360
-                 ):
+                 render_height: int = 360):
         # setup render settings
         self.bc = bc
         self.cam_base_pos = cam_base_pos
@@ -1055,5 +950,4 @@ class Camera:
             cameraTargetPosition=self.cam_base_pos,
             cameraDistance=self.cam_dist,
             cameraYaw=self.cam_yaw,
-            cameraPitch=self.cam_pitch
-        )
+            cameraPitch=self.cam_pitch)

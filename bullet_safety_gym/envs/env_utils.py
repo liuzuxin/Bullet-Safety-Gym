@@ -1,21 +1,22 @@
 import numpy as np
+
 from bullet_safety_gym.envs import bases
 
 
 def check_min_distance(a_pos_list, b_pos, min_allowed_distance):
-    min_distance = np.min(
-        np.linalg.norm(np.vstack(a_pos_list) - b_pos, axis=1))
+    min_distance = np.min(np.linalg.norm(np.vstack(a_pos_list) - b_pos,
+                                         axis=1))
 
     return min_distance > min_allowed_distance
 
 
 def generate_obstacles_init_pos(
-        num_obstacles: int,
-        agent_pos: tuple,
-        world: bases.World,
-        goal_pos: np.ndarray = np.array([]),
-        min_allowed_distance: float = 2.5,
-        agent_obstacle_distance: float = 2.5,
+    num_obstacles: int,
+    agent_pos: tuple,
+    world: bases.World,
+    goal_pos: np.ndarray = np.array([]),
+    min_allowed_distance: float = 2.5,
+    agent_obstacle_distance: float = 2.5,
 ):
     assert num_obstacles > 0
     i = 0
@@ -25,9 +26,11 @@ def generate_obstacles_init_pos(
 
     while i < num_obstacles:
         xyz = world.generate_random_xyz_position()
-        if not satisfies_distance_criterion(agent_pos[:2], xyz[:2], agent_obstacle_distance):
+        if not satisfies_distance_criterion(agent_pos[:2], xyz[:2],
+                                            agent_obstacle_distance):
             continue
-        if len(xyz_list) == 0 or check_min_distance(xyz_list, xyz, min_allowed_distance):
+        if len(xyz_list) == 0 or check_min_distance(xyz_list, xyz,
+                                                    min_allowed_distance):
             xyz_list.append(xyz)
             i += 1
         if i > 1000:

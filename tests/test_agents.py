@@ -1,24 +1,25 @@
 #!/usr/bin/env python
 
+import inspect
 import unittest
+
 import pybullet as pb
 from pybullet_utils import bullet_client
-import inspect
 
 
 class TestAgents(unittest.TestCase):
+
     @classmethod
     def create_agent(cls, agent_cls):
         bc = bullet_client.BulletClient(connection_mode=pb.DIRECT)
-        agent = agent_cls(
-            bc=bc
-        )
+        agent = agent_cls(bc=bc)
         print(f'Spawn {agent.name} at init pos:', agent.get_position())
         return agent
 
     def test_locomotion_agents(self):
         # first import module
         from bullet_safety_gym.envs import agents
+
         # then check all implemented classes...
         for name, agent_cls in inspect.getmembers(agents):
             if inspect.isclass(agent_cls):

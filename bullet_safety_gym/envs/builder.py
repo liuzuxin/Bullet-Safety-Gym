@@ -6,12 +6,13 @@ r"""Open-Safety Gym
 """
 
 import ctypes
-import sys
 import os
-import numpy as np
 import pkgutil
-import gym
-from gym import error
+import sys
+
+import gymnasium as gym
+import numpy as np
+from gymnasium import error
 
 
 class RedirectStream(object):
@@ -46,9 +47,11 @@ class RedirectStream(object):
 
 with RedirectStream(sys.stderr):
     import pybullet as pb
+
 from pybullet_utils import bullet_client
+
+from bullet_safety_gym.envs import agents, bases, tasks, worlds
 from bullet_safety_gym.envs.obstacles import create_obstacles
-from bullet_safety_gym.envs import bases, worlds, tasks, agents
 
 
 def get_physics_parameters(task: str) -> tuple:
@@ -375,7 +378,7 @@ class EnvironmentBuilder(gym.Env):
         done = not self.agent.alive
         if self.task.goal_achieved:
             if self.task.continue_after_goal_achievement:
-                r += 30 # add sparse reward  5.0
+                r += 30  # add sparse reward  5.0
                 self.task.update_goal()
             else:
                 done = True

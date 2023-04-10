@@ -1,5 +1,6 @@
-import pybullet as pb
 import numpy as np
+import pybullet as pb
+
 from bullet_safety_gym.envs import bases
 
 
@@ -9,12 +10,12 @@ class Ball(bases.Agent):
     The ball is moved via external forces that are applied in world coordinates.
     Observations are in R^7 and actions are in R^2.
     """
+
     def __init__(
             self,
             bc,
             init_xyz=(0, 0, .5),  # ball diameter is 0.5
-            debug=False
-    ):
+            debug=False):
         super().__init__(
             bc,
             'base_link',
@@ -29,8 +30,7 @@ class Ball(bases.Agent):
             velocity_constraint=2.5,
             max_force=3.5,
             max_velocity=0,  # irrelevant parameter (external force controlled)
-            debug=debug
-        )
+            debug=debug)
         self.radius = 0.5
         self.size_violation_shape = self.global_scaling * 1.25 * self.radius
         self.last_taken_action = np.zeros(self.act_dim)
@@ -69,12 +69,10 @@ class Ball(bases.Agent):
                 if k == pb.B3G_RIGHT_ARROW and (v & pb.KEY_IS_DOWN):
                     x += 1
 
-        self.apply_external_force(
-            force=np.array([x, y, 0.]) * self.max_force,
-            link_id=-1,
-            position=sphere_pos,
-            frame=pb.WORLD_FRAME
-        )
+        self.apply_external_force(force=np.array([x, y, 0.]) * self.max_force,
+                                  link_id=-1,
+                                  position=sphere_pos,
+                                  frame=pb.WORLD_FRAME)
 
     def get_linear_velocity(self) -> np.ndarray:
         """ over-write Agent class since Ball owns only one body."""
@@ -121,11 +119,8 @@ class RaceCar(bases.Agent):
     the target wheel velocity for all four wheels and the target steering angle.
     Observations are in R^7 and actions are in R^2.
     """
-    def __init__(
-            self, 
-            bc, 
-            init_xyz=(0, 0, 0.2), 
-            debug=False):
+
+    def __init__(self, bc, init_xyz=(0, 0, 0.2), debug=False):
         super().__init__(
             bc,
             'base_link',
@@ -142,8 +137,7 @@ class RaceCar(bases.Agent):
             max_force=20,  # PyBullet default value: 20
             max_velocity=0,  # irrelevant parameter (force-controlled agent)
             violation_shape_factor=0.35,
-            debug=debug
-        )
+            debug=debug)
         self.steering_links = [0, 2]
         self.motorized_wheels = [8, 15]
         self.speed_multiplier = 40.  # PyBullet default value: 20
@@ -237,7 +231,10 @@ class RaceCar(bases.Agent):
                                      jointAxis=[0, 1, 0],
                                      parentFramePosition=[0, 0, 0],
                                      childFramePosition=[0, 0, 0])
-        self.bc.changeConstraint(c, gearRatio=-1, gearAuxLink=15, maxForce=10000)
+        self.bc.changeConstraint(c,
+                                 gearRatio=-1,
+                                 gearAuxLink=15,
+                                 maxForce=10000)
         c = self.bc.createConstraint(car,
                                      3,
                                      car,
@@ -246,7 +243,10 @@ class RaceCar(bases.Agent):
                                      jointAxis=[0, 1, 0],
                                      parentFramePosition=[0, 0, 0],
                                      childFramePosition=[0, 0, 0])
-        self.bc.changeConstraint(c, gearRatio=-1, gearAuxLink=15, maxForce=10000)
+        self.bc.changeConstraint(c,
+                                 gearRatio=-1,
+                                 gearAuxLink=15,
+                                 maxForce=10000)
 
     def agent_specific_observation(self):
         """ State of cart is of shape (6,) """
@@ -278,15 +278,15 @@ class RaceCar(bases.Agent):
 
         for motor in self.motorized_wheels:
             self.bc.setJointMotorControl2(self.body_id,
-                                        motor,
-                                        self.bc.VELOCITY_CONTROL,
-                                        targetVelocity=targetVelocity,
-                                        force=self.max_force)
+                                          motor,
+                                          self.bc.VELOCITY_CONTROL,
+                                          targetVelocity=targetVelocity,
+                                          force=self.max_force)
         for steer in self.steering_links:
             self.bc.setJointMotorControl2(self.body_id,
-                                        steer,
-                                        self.bc.POSITION_CONTROL,
-                                        targetPosition=steeringAngle)
+                                          steer,
+                                          self.bc.POSITION_CONTROL,
+                                          targetPosition=steeringAngle)
 
     def add_sensor(self, sensor):
         """ Racing Car needs an adjustment of sensor heights."""
@@ -311,31 +311,22 @@ class RaceCar(bases.Agent):
 
 
 class MJCFAgent(bases.Agent):
-    def __init__(
-        self,
-        bc,
-        name,
-        file_name,
-        foot_list,
-        max_force,
-        **kwargs
-    ):
-        super().__init__(
-            bc,
-            name,
-            file_name,
-            fixed_base=False,
-            global_scaling=1.0,
-            self_collision=True,
-            max_velocity=5,
-            max_force=max_force,
-            **kwargs
-        )
+
+    def __init__(self, bc, name, file_name, foot_list, max_force, **kwargs):
+        super().__init__(bc,
+                         name,
+                         file_name,
+                         fixed_base=False,
+                         global_scaling=1.0,
+                         self_collision=True,
+                         max_velocity=5,
+                         max_force=max_force,
+                         **kwargs)
         self.foot_list = foot_list
         self.feet_contact = np.array([0.0 for _ in self.foot_list],
                                      dtype=np.float32)
         self.feet = [self.link_dict[f] for f in self.foot_list]
-        
+
         # track movement costs
         self.feet_collision_reward = 0.0
         self.joints_at_limit_reward = 0.0
@@ -346,7 +337,7 @@ class MJCFAgent(bases.Agent):
         self.electricity_factor = -2.0  # cost for using motors
         self.stall_torque_factor = -0.1  # cost for running electric current
         self.joints_at_limit_factor = -0.1  # discourage stuck joints
-        
+
         # increase power of all MJCF agents' motors
         for m in self.motor_list:
             m.power_coefficient = 100.
@@ -374,9 +365,8 @@ class MJCFAgent(bases.Agent):
         self.feet_collision_reward = 0.0
 
         # ===== Update joint costs
-        j = np.array(
-            [j.get_relative_position() for j in self.motor_list],
-            dtype=np.float32).flatten()
+        j = np.array([j.get_relative_position() for j in self.motor_list],
+                     dtype=np.float32).flatten()
         non_zeros = np.count_nonzero(np.abs(j[0::2]) > 0.99)
         self.joints_at_limit_reward = self.joints_at_limit_factor * non_zeros
 
@@ -387,9 +377,8 @@ class MJCFAgent(bases.Agent):
         self.action_reward = e_cost + stall_torque
 
     def agent_specific_observation(self) -> np.ndarray:
-        js = np.array(
-            [j.get_relative_position() for j in self.motor_list],
-            dtype=np.float32).flatten()
+        js = np.array([j.get_relative_position() for j in self.motor_list],
+                      dtype=np.float32).flatten()
         obs = np.concatenate([
             0.1 * self.get_position(),
             0.3 * self.get_linear_velocity(),
@@ -416,23 +405,20 @@ class MJCFAgent(bases.Agent):
         """ Some agents exhibit additional rewards besides the task objective,
             e.g. electricity costs, speed costs, etc. """
         alive_reward = 1.0 if self.alive else -1
-        r = sum([self.action_reward,
-                 self.feet_collision_reward,
-                 self.joints_at_limit_reward,
-                 alive_reward
-                 ])
+        r = sum([
+            self.action_reward, self.feet_collision_reward,
+            self.joints_at_limit_reward, alive_reward
+        ])
         return r
 
 
 class Ant(MJCFAgent):
-    foot_list = ['front_left_foot', 'front_right_foot',
-                 'left_back_foot', 'right_back_foot']
+    foot_list = [
+        'front_left_foot', 'front_right_foot', 'left_back_foot',
+        'right_back_foot'
+    ]
 
-    def __init__(
-            self,
-            bc,
-            **kwargs
-    ):
+    def __init__(self, bc, **kwargs):
         super().__init__(
             bc=bc,
             name='torso',
@@ -444,8 +430,7 @@ class Ant(MJCFAgent):
             max_force=2.5,
             velocity_constraint=1.5,
             foot_list=Ant.foot_list,
-            **kwargs
-        )
+            **kwargs)
         self.radius = 0.25
         self.size_violation_shape = self.global_scaling * 2.5 * self.radius
 
@@ -472,7 +457,7 @@ class Ant(MJCFAgent):
         """
         for i, j in enumerate(self.motor_list):
             noise = np.random.uniform(low=-0.1, high=0.1)
-            pos = noise if i % 2 == 0 else np.pi/2 + noise
+            pos = noise if i % 2 == 0 else np.pi / 2 + noise
             if i == 3 or i == 5:
                 pos *= -1
             j.reset_position_and_disable_motor(pos, 0)
@@ -494,10 +479,12 @@ class Drone(bases.Agent):
     Meshes from:
         - https://github.com/ethz-asl/rotors_simulator/tree/master/rotors_description/meshes
     """
-    def __init__(self,
-                 bc,
-                 init_xyz=(0, 0, .17),  # initially touches ground plane
-                 debug=False):
+
+    def __init__(
+            self,
+            bc,
+            init_xyz=(0, 0, .17),  # initially touches ground plane
+            debug=False):
         # from URDF file..
         self.radius = 0.14
         self.diameter = 2. * self.radius
@@ -508,7 +495,7 @@ class Drone(bases.Agent):
         self.propeller_directions = np.array([+1, -1, +1, -1])
         self.propeller_pitch = 4.7 * 0.0254
         # some constants
-        self.k1 = 1./3.29546
+        self.k1 = 1. / 3.29546
         self.k2 = 1.5
         self.gravity = 9.81
         self.air_density = 1.225
@@ -531,8 +518,7 @@ class Drone(bases.Agent):
             max_force=23.444,  # Maximum force used for RPM control of motors
             max_velocity=770,  # rad/sec
             violation_shape_factor=0.35,
-            debug=debug
-        )
+            debug=debug)
         # collect link info
         self.rotor_ground_contact = np.zeros_like(self.link_list)
         self.ground_collision_penalty = 0.0
@@ -547,7 +533,8 @@ class Drone(bases.Agent):
         # By default, PyBullet clamps angular velocities to 100 rad/s
         self.max_joint_velocity = 1000
         for m in self.motor_list:
-            self.bc.changeDynamics(self.body_id, m.index,
+            self.bc.changeDynamics(self.body_id,
+                                   m.index,
                                    maxJointVelocity=self.max_joint_velocity)
 
     def agent_specific_observation(self):
@@ -575,27 +562,21 @@ class Drone(bases.Agent):
 
         # PyBullet can not simulate air, calculate thrust force of the given
         # joints, and apply it on the link
-        for motor, d, v in zip(self.motor_list,
-                               self.propeller_directions,
+        for motor, d, v in zip(self.motor_list, self.propeller_directions,
                                target_velocities):
             motor.set_velocity(v)
-            linear_velocity = np.array(xyz_dot)  #  Cartesian world linear velocity
+            linear_velocity = np.array(
+                xyz_dot)  #  Cartesian world linear velocity
             propeller_up_vec = R.dot(np.array([0., 0., 1.]))
             v0 = linear_velocity.dot(propeller_up_vec)
             # compute thrust
-            f = self.calculate_thrust_force(
-                v * d,
-                self.area,
-                self.propeller_pitch,
-                v0
-            )
+            f = self.calculate_thrust_force(v * d, self.area,
+                                            self.propeller_pitch, v0)
             # apply force in the simulation
-            self.apply_external_force(
-                force=np.array([0, 0, f]),
-                link_id=motor.index,
-                position=(0., 0., 0.),
-                frame=pb.LINK_FRAME
-            )
+            self.apply_external_force(force=np.array([0, 0, f]),
+                                      link_id=motor.index,
+                                      position=(0., 0., 0.),
+                                      frame=pb.LINK_FRAME)
 
     def add_sensor(self, sensor) -> None:
         """ Cart needs to adjust height of sensors."""
@@ -614,12 +595,12 @@ class Drone(bases.Agent):
             area: float,
             propeller_pitch: float,
             v0: float = 0,
-            air_density: float = 1.225
-    ) -> float:
+            air_density: float = 1.225) -> float:
         """Determine thrust force based on current rotor speed. """
-        tmp = angular_speed / (2*np.pi) * propeller_pitch
+        tmp = angular_speed / (2 * np.pi) * propeller_pitch
         diameter = (4. * area / np.pi)**0.5
-        return air_density * area * (tmp**2 - tmp*v0) * (self.k1 * diameter / propeller_pitch)**self.k2
+        return air_density * area * (tmp**2 - tmp * v0) * (
+            self.k1 * diameter / propeller_pitch)**self.k2
 
     def collect_information_after_step(self):
         """Determine if Drone agent touches the ground plane."""
@@ -636,15 +617,18 @@ class Drone(bases.Agent):
     def get_stationary_joint_velocity(self) -> float:
         fg = self.mass * self.gravity / 4.
         p = self.propeller_pitch
-        j_vel_stationary = (2*np.pi / p) * (fg / (self.air_density * self.area) * (p / (self.k1 * self.diameter))**self.k2)**0.5
+        j_vel_stationary = (2 * np.pi /
+                            p) * (fg / (self.air_density * self.area) *
+                                  (p /
+                                   (self.k1 * self.diameter))**self.k2)**0.5
         return j_vel_stationary
 
     def get_stationary_rpm(self) -> float:
         """ Default Stationary RPM: 4407.2195"""
         fg = self.mass * self.gravity / 4.
         p = self.propeller_pitch
-        rmp_stat = (60 / p) * (fg / (self.air_density * self.area)
-                               * (p / (self.k1 * self.diameter))**self.k2)**0.5
+        rmp_stat = (60 / p) * (fg / (self.air_density * self.area) *
+                               (p / (self.k1 * self.diameter))**self.k2)**0.5
         return rmp_stat
 
     def specific_reset(self) -> None:
