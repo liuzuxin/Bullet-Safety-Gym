@@ -1,8 +1,22 @@
-**Notes:** This repo requires `gymnasium>=0.26.3` API version due to the major changes in the `reset` and `step` functions.  Check [this release note](https://gymnasium.farama.org/content/migration-guide/) for details.
+
+<div align="center">
+<h1>
+  Bullet-Safety-Gym
+</h1>
+</div>
+<div align="center">
+
+  <a>![Python 3.8+](https://img.shields.io/badge/Python-3.8%2B-brightgreen.svg)</a>
+  <a href="https://pypi.org/project/bullet-safety-gym">![PyPI](https://img.shields.io/pypi/v/bullet-safety-gym?logo=pypi)</a>
+  [![Downloads](https://static.pepy.tech/badge/bullet-safety-gym)](https://pepy.tech/project/bullet-safety-gym)
+  <a href="https://github.com/liuzuxin/Bullet-Safety-Gym/blob/master/LICENSE">![License](https://img.shields.io/badge/License-MIT-yellow.svg)</a>
+
+</div>
+
+
+:warning: **Notes:** This repo requires `gymnasium>=0.26.3` API version due to the major changes in the `reset` and `step` functions.  Check [this release note](https://gymnasium.farama.org/content/migration-guide/) for details.
 For `gym>=0.26` version, please use the `gym-v26` [branch](https://github.com/liuzuxin/Bullet-Safety-Gym/tree/gym-v26).
 For the old API (`gym<0.26`) version, please use the `old_api` [branch](https://github.com/liuzuxin/Bullet-Safety-Gym/tree/old_api) which requires `gym==0.23.1`.
-
-# Bullet-Safety-Gym
 
 "Bullet-Safety-Gym" is a free and open-source framework to benchmark and assess 
 safety specifications in Reinforcement Learning (RL) problems.
@@ -44,7 +58,7 @@ Bullet-Safety-Gym is shipped with the following four agents:
 
 Ball | Car | Drone | Ant
 --- | ---| ---| ---
-![Ball](./docs/figures/agent_ball.png) |![Car Agent](./docs/figures/agent_car.png)|![Drone Agent](./docs/figures/agent_drone.png)|![Ant Agent](./docs/figures/agent_ant.png)
+![Ball](https://github.com/liuzuxin/Bullet-Safety-Gym/raw/master/docs/figures/agent_ball.png) |![Car Agent](https://github.com/liuzuxin/Bullet-Safety-Gym/raw/master/docs/figures/agent_car.png)|![Drone Agent](https://github.com/liuzuxin/Bullet-Safety-Gym/raw/master/docs/figures/agent_drone.png)|![Ant Agent](https://github.com/liuzuxin/Bullet-Safety-Gym/raw/master/docs/figures/agent_ant.png)
 
 
 
@@ -82,16 +96,18 @@ threshold.
 
 Circle | Gather | Reach | Run
 --- | ---| ---| ---
-![Circle](./docs/figures/task_circle.png) |![Gather](./docs/figures/task_gather.png)|![Reach](./docs/figures/task_reach.png)|![Run](./docs/figures/task_run.png)
+![Circle](https://github.com/liuzuxin/Bullet-Safety-Gym/raw/master/docs/figures/task_circle.png) |![Gather](https://github.com/liuzuxin/Bullet-Safety-Gym/raw/master/docs/figures/task_gather.png)|![Reach](https://github.com/liuzuxin/Bullet-Safety-Gym/raw/master/docs/figures/task_reach.png)|![Run](https://github.com/liuzuxin/Bullet-Safety-Gym/raw/master/docs/figures/task_run.png)
 
 
 
 # Installation
 
-Here are the (few) steps to follow to get our repository ready to run.
+You may simple install the latest version by running:
+```
+pip install bullet-safety-gym
+```
 
-Clone the repository and install the Bullet-Safety-Gym package via pip. Use the 
-following three lines:
+Alternatively, here are the (few) steps to follow to install this repository manually.
 
 ```
 git clone https://github.com/liuzuxin/Bullet-Safety-Gym.git
@@ -103,7 +119,7 @@ pip install -e .
 
 ## Supported Systems
 
-We currently support Linux and OS X running Python 3.7 or greater.
+We currently support Linux and OS X running Python 3.8 or greater.
 Windows should also work (but has not been tested yet).
 
 Note: This package has been tested on Mac OS Mojave and Ubuntu (18.04 LTS, 
@@ -148,7 +164,7 @@ A minimal code for visualizing a uniformly random policy in a GUI, can be seen
 in:
 
 ```
-import gym
+import gymnasium as gym
 import bullet_safety_gym
 
 env = gym.make('SafetyAntCircle-v0')

@@ -199,7 +199,7 @@ register(
 
 register(id='SafetyAntCircle-v0',
          entry_point='bullet_safety_gym.envs.builder:EnvironmentBuilder',
-         max_episode_steps=300,
+         max_episode_steps=500,
          apply_api_compatibility=True,
          kwargs=dict(
              agent='Ant',
@@ -279,7 +279,7 @@ register(
 register(
     id='SafetyDroneRun-v0',
     entry_point='bullet_safety_gym.envs.builder:EnvironmentBuilder',
-    max_episode_steps=100,
+    max_episode_steps=200,
     apply_api_compatibility=True,
     kwargs=dict(
         agent='Drone',

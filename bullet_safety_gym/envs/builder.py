@@ -54,7 +54,7 @@ from bullet_safety_gym.envs import agents, bases, tasks, worlds
 from bullet_safety_gym.envs.obstacles import create_obstacles
 
 
-def get_physics_parameters(task: str) -> tuple:
+def get_physics_parameters(task: str, agent: str) -> tuple:
     """PyBullet physics simulation parameters depend on the task.
 
     Parameters
@@ -78,6 +78,9 @@ def get_physics_parameters(task: str) -> tuple:
         time_step = 1 / 120.
         frame_skip = 4
         number_solver_iterations = 5
+        if agent.lower() == "drone":
+            time_step = 1 / 120.
+            frame_skip = 2
     elif task in ['CircleTask']:
         time_step = 1 / 60.
         frame_skip = 6
@@ -141,7 +144,7 @@ class EnvironmentBuilder(gym.Env):
         self.global_scaling = world.get('factor', 1.0)
 
         # Physics parameters depend on the task
-        time_step, frame_skip, num_solver_iter = get_physics_parameters(task)
+        time_step, frame_skip, num_solver_iter = get_physics_parameters(task, agent)
         self.time_step = time_step
         self.frame_skip = frame_skip
         self.number_solver_iterations = num_solver_iter
