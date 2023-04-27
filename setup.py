@@ -51,7 +51,7 @@ setup(
     },
     license='MIT license',
     url='https://github.com/liuzuxin/Bullet-Safety-Gym',
-    install_requires=['gymnasium~=0.26.3', 'numpy>1.16.0', 'pybullet>=3.0.6'],
+    install_requires=['gymnasium~=0.28.1', 'numpy>1.16.0', 'pybullet>=3.0.6'],
     extras_require=get_extras_require(),
     python_requires='>=3.8',
     platforms=['Linux Ubuntu', 'darwin'],  # supports Linux and Mac OSX

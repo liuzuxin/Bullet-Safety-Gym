@@ -258,6 +258,7 @@ class RaceCar(bases.Agent):
         return np.concatenate((xy, xy_dot, yaw_info))
 
     def apply_action(self, motorCommands):
+        motorCommands = super().apply_action(motorCommands)
         targetVelocity = motorCommands[0] * self.speed_multiplier
         steeringAngle = motorCommands[1] * self.steering_multiplier
 
