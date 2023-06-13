@@ -386,7 +386,10 @@ class EnvironmentBuilder(gym.Env):
             else:
                 done = True
         next_obs = self.get_observation()
-        return next_obs, r, done, info
+        truncated = info.pop("TimeLimit.truncated", False)
+        terminated = done and not truncated
+        truncated = done and truncated
+        return next_obs, r, terminated, truncated, info
 
     def render(self, mode='human') -> np.ndarray:
         """Show PyBullet GUI visualization.
@@ -442,7 +445,7 @@ class EnvironmentBuilder(gym.Env):
             rgb_array = rgb_array[:, :, :3]
             return rgb_array
 
-    def reset(self) -> np.ndarray:
+    def reset(self, seed=None, options=None) -> np.ndarray:
         """Reset environment to initial state.
 
         This function is called after agent encountered terminal state.
@@ -466,4 +469,4 @@ class EnvironmentBuilder(gym.Env):
         self.bc.stepSimulation()
         if self.use_graphics:
             self.bc.configureDebugVisualizer(self.bc.COV_ENABLE_RENDERING, 1)
-        return self.get_observation()
+        return self.get_observation(), {}
