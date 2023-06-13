@@ -128,7 +128,7 @@ class EnvironmentBuilder(gym.Env):
         )
         env = EnvironmentBuilder(**layout)
     """
-    metadata = {'render.modes': ['human', 'rgb_array']}
+    metadata = {'render_modes': ['human', 'rgb_array']}
 
     def __init__(self,
                  agent: str,
