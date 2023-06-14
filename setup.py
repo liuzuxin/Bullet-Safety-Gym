@@ -37,9 +37,9 @@ def get_extras_require() -> str:
 
 setup(
     name='bullet_safety_gym',
-    version='1.3.0',
-    author='Sven Gronauer',
-    author_email='sven.gronauer@tum.de',
+    version='1.4.0',
+    author='bullet-safety-gym-contributors',
+    author_email='zuxin1997@gmail.com',
     description='A framework to benchmark safety in Reinforcement Learning.',
     long_description=long_description,
     long_description_content_type="text/markdown",

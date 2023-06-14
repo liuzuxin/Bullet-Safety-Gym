@@ -83,8 +83,6 @@ trivial solutions. We implemented obstacles with a physical body, into which
 agents can collide and receive costs, and ones without collision shape that 
 produce costs for traversing. Rewards are dense and increase for moving closer 
 to the goal and a sparse component is obtained when entering the goal zone. 
-    
-
 
 + **Run**: Agents are rewarded for running through an avenue between two 
 safety boundaries (Chow et al. 2019). The boundaries are non-physical 
@@ -139,7 +137,7 @@ After the successful installation of the repository, the Bullet-Safety-Gym
 environments can be simply instantiated via `gym.make`. See: 
 
 ```
->>> import gym
+>>> import gymnasium as gym
 >>> import bullet_safety_gym
 >>> env = gym.make('SafetyCarCircle-v0')
 ```
