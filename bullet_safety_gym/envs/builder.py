@@ -128,7 +128,8 @@ class EnvironmentBuilder(gym.Env):
         )
         env = EnvironmentBuilder(**layout)
     """
-    metadata = {'render_modes': ['human', 'rgb_array']}
+    metadata = {'render_modes': ['human', 'rgb_array'],
+                'render_fps': 10}
 
     def __init__(self,
                  agent: str,
@@ -136,7 +137,8 @@ class EnvironmentBuilder(gym.Env):
                  obstacles: dict,
                  world: dict,
                  graphics=False,
-                 debug=False):
+                 debug=False,
+                 **kwargs):
         self.input_parameters = locals()  # save setting for later reset
         self.use_graphics = graphics
         self.debug = debug
@@ -415,6 +417,8 @@ class EnvironmentBuilder(gym.Env):
                 self.bc.disconnect()
                 self.use_graphics = True
                 self.bc = self._setup_client_and_physics(graphics=True)
+                self.bullet_client_id = self.bc._client
+                self.stored_state_id = -1
                 self._setup_simulation()
         if mode != "rgb_array":
             return np.array([])
